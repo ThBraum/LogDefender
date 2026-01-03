@@ -1,0 +1,9 @@
+services:
+  logdefender:
+    build: .
+    container_name: logdefender
+    volumes:
+      - ./out:/app/out
+      - ./samples:/app/samples:ro
+    command: ["python", "-m", "logdefender", "analyze", "samples/nginx_access.sample.jsonl", "--out", "out"]
+    restart: "no"
