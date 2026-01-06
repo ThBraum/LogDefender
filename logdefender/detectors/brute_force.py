@@ -64,7 +64,10 @@ def detect_bruteforce(
                     confidence += 0.15
                 if any(s == 429 for s in statuses):
                     confidence += 0.05
-                if any(ua and ("curl" in ua.lower() or "python-requests" in ua.lower()) for ua in user_agents):
+                if any(
+                    ua and ("curl" in ua.lower() or "python-requests" in ua.lower())
+                    for ua in user_agents
+                ):
                     confidence += 0.15
                 confidence = _clamp01(confidence)
 

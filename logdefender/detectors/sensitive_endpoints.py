@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from typing import List
+
 from logdefender.models import Alert, Event
 
 
@@ -42,7 +43,10 @@ def detect_sensitive_endpoints(
         confidence = 0.75
         if success_hits > 0:
             confidence += 0.15
-        if any(e.user_agent and ("sqlmap" in e.user_agent.lower() or "nmap" in e.user_agent.lower()) for e in evs):
+        if any(
+            e.user_agent and ("sqlmap" in e.user_agent.lower() or "nmap" in e.user_agent.lower())
+            for e in evs
+        ):
             confidence += 0.05
         confidence = _clamp01(confidence)
 

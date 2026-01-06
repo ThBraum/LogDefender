@@ -52,7 +52,11 @@ def detect_scanning(
                     confidence += 0.10
                 if 404 in statuses and 403 in statuses:
                     confidence += 0.05
-                if any(x.user_agent and ("nmap" in x.user_agent.lower() or "dirbuster" in x.user_agent.lower()) for x in q):
+                if any(
+                    x.user_agent
+                    and ("nmap" in x.user_agent.lower() or "dirbuster" in x.user_agent.lower())
+                    for x in q
+                ):
                     confidence += 0.10
                 confidence = _clamp01(confidence)
 

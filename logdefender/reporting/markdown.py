@@ -37,9 +37,7 @@ def write_report_md(events: List[Event], alerts: List[Alert], out_dir: str | Pat
             lines.append(f"- ID do alerta: `{a.alert_id}`\n")
         lines.append(f"- Severidade: **{a.severity}**\n")
         lines.append(f"- Confiança: **{a.confidence:.2f}**\n")
-        lines.append(
-            f"- Janela: `{a.first_seen.isoformat()}` → `{a.last_seen.isoformat()}`\n"
-        )
+        lines.append(f"- Janela: `{a.first_seen.isoformat()}` → `{a.last_seen.isoformat()}`\n")
         lines.append(f"- Janela de tempo: **{a.time_window_seconds}s**\n")
         lines.append(f"- Contagem de eventos: **{a.count}**\n")
         if a.entities:

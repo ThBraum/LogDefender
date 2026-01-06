@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 from collections import defaultdict
 from typing import List
+
 from logdefender.models import Alert, Event
 
 
@@ -20,7 +21,9 @@ DEFAULT_PATTERNS = [
 ]
 
 
-def detect_suspicious_user_agents(events: List[Event], patterns: List[str] | None = None) -> List[Alert]:
+def detect_suspicious_user_agents(
+    events: List[Event], patterns: List[str] | None = None
+) -> List[Alert]:
     patterns = patterns or DEFAULT_PATTERNS
     regexes = [re.compile(p, re.IGNORECASE) for p in patterns]
 
@@ -53,9 +56,16 @@ def detect_suspicious_user_agents(events: List[Event], patterns: List[str] | Non
 
         # heurística simples baseada em ferramentas frequentemente automatizadas
         confidence = 0.60
-        if any(ua and ("sqlmap" in ua.lower() or "nmap" in ua.lower() or "dirbuster" in ua.lower()) for ua in unique_uas):
+        if any(
+            ua and ("sqlmap" in ua.lower() or "nmap" in ua.lower() or "dirbuster" in ua.lower())
+            for ua in unique_uas
+        ):
             confidence += 0.20
-        if any(ua and ("python-requests" in ua.lower() or "curl" in ua.lower() or "wget" in ua.lower()) for ua in unique_uas):
+        if any(
+            ua
+            and ("python-requests" in ua.lower() or "curl" in ua.lower() or "wget" in ua.lower())
+            for ua in unique_uas
+        ):
             confidence += 0.10
         if count >= 10:
             confidence += 0.05
