@@ -12,7 +12,7 @@ def write_alerts_json(alerts: List[Alert], out_dir: str | Path) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     out_path = out_dir / "alerts.json"
-    payload = [a.model_dump() for a in alerts]
+    payload = [a.model_dump(by_alias=True) for a in alerts]
 
     out_path.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
