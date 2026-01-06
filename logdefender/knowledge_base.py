@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import json
 from functools import lru_cache
-from typing import Any, Dict, List, Optional
-
 from importlib import resources
+from typing import Any, Dict, List, Optional
 
 
 def _read_json_resource(package: str, name: str) -> Dict[str, Any]:

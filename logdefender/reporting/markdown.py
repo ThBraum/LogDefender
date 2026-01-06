@@ -4,12 +4,8 @@ from collections import Counter
 from pathlib import Path
 from typing import List
 
+from logdefender.knowledge_base import format_mitre_line, get_mitre_for_rule, get_playbook_for_rule
 from logdefender.models import Alert, Event
-from logdefender.knowledge_base import (
-    format_mitre_line,
-    get_mitre_for_rule,
-    get_playbook_for_rule,
-)
 
 
 def write_report_md(events: List[Event], alerts: List[Alert], out_dir: str | Path) -> Path:
