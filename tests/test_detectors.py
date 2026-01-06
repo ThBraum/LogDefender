@@ -1,6 +1,7 @@
-from datetime import datetime, timezone, timedelta
-from logdefender.models import Event
+from datetime import datetime, timedelta, timezone
+
 from logdefender.detectors.brute_force import detect_bruteforce
+from logdefender.models import Event
 
 
 def test_bruteforce_triggers():
