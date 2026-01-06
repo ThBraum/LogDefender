@@ -44,9 +44,18 @@ def test_run_analysis_writes_outputs(tmp_path: Path):
         assert "entities" in a
         assert "evidence" in a
         assert "recommended_actions" in a
+        assert "mitre" in a
+        assert "triage_playbook" in a
 
         assert a["severity"] in {"low", "medium", "high"}
         assert 0.0 <= float(a["confidence"]) <= 1.0
         assert isinstance(a["entities"], dict)
         assert isinstance(a["evidence"], list)
         assert isinstance(a["recommended_actions"], list)
+        assert a["mitre"] is None or isinstance(a["mitre"], dict)
+        assert a["triage_playbook"] is None or isinstance(a["triage_playbook"], dict)
+
+    # Se houver alertas, o report deve conter MITRE e playbook de triagem.
+    if alerts:
+        assert "MITRE ATT&CK:" in report_text
+        assert "Playbook de triagem:" in report_text

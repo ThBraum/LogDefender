@@ -1,0 +1,112 @@
+{
+    "BRUTE_FORCE": {
+        "check_first": [
+            "Confirmar se o IP/ASN é conhecido (VPN corporativa, monitoramento, pentest autorizado)",
+            "Checar se houve login bem-sucedido após a sequência de falhas",
+            "Verificar se o usuário alvo existe e se é privilegiado"
+        ],
+        "validation_questions": [
+            "Há sucesso de login depois das falhas? Qual IP/UA fez o sucesso?",
+            "O usuário teve MFA? Houve desafios de MFA negados?",
+            "O padrão é de password spraying (muitos users) ou brute force (um user)?"
+        ],
+        "containment_steps": [
+            "Aplicar rate-limit/ban temporário no IP (WAF/ingress/fail2ban)",
+            "Se usuário alvo, reset de senha e exigir MFA",
+            "Adicionar alertas/correlações para novas tentativas do mesmo IP/UA"
+        ],
+        "escalate_when": [
+            "Houve login bem-sucedido após as falhas",
+            "Alvo é conta privilegiada (admin/operador)",
+            "Volume muito alto (ex.: ≥ 50 tentativas em 5 min)"
+        ]
+    },
+    "SCAN_4XX": {
+        "check_first": [
+            "Confirmar se o IP pertence a scanner autorizado (VA/red team)",
+            "Verificar diversidade de paths e presença de wordlists (padrão /wp-, /.git, /admin)",
+            "Checar se há outros sinais do mesmo IP (SUSPICIOUS_UA, SENSITIVE_ENDPOINT_ACCESS)"
+        ],
+        "validation_questions": [
+            "O tráfego é concentrado em poucos paths (bug) ou em muitos (enumeração)?",
+            "Há concentração em horários específicos ou é contínuo?",
+            "Qual a taxa de 404 vs 403?"
+        ],
+        "containment_steps": [
+            "Aplicar bloqueio/rate-limit temporário no IP",
+            "Reforçar WAF/ACL para paths sensíveis",
+            "Se recorrente, bloquear por ASN/geo (se fizer sentido no seu contexto)"
+        ],
+        "escalate_when": [
+            "Inclui paths sensíveis (/.env, /.git, /admin)",
+            "Há sinais de exploração (respostas < 400 em endpoints sensíveis)",
+            "Volume muito alto (ex.: ≥ 200 4xx em poucos minutos)"
+        ]
+    },
+    "HIGH_4XX_RATE": {
+        "check_first": [
+            "Validar se há incidente de aplicação (rota quebrada/deploy) causando 4xx",
+            "Verificar quantidade de paths únicos (muitos paths sugere enumeração)",
+            "Correlacionar com SCAN_4XX e SUSPICIOUS_UA"
+        ],
+        "validation_questions": [
+            "Há pico de 4xx para todos os IPs ou só para um?",
+            "Quais são os top paths com 4xx?",
+            "Há UA automatizado (requests/curl) associado?"
+        ],
+        "containment_steps": [
+            "Se não autorizado, rate-limit/bloqueio temporário",
+            "Se for bug/deploy, abrir incidente de app e mitigar rotas",
+            "Aprimorar logging/correlação por path e status"
+        ],
+        "escalate_when": [
+            "Taxa muito alta (ratio ≥ 0.9) e muitos paths únicos",
+            "Há tentativa em endpoints sensíveis",
+            "Reincidência após bloqueio"
+        ]
+    },
+    "SENSITIVE_ENDPOINT_ACCESS": {
+        "check_first": [
+            "Confirmar se o endpoint existe e deveria estar exposto",
+            "Verificar se foi bloqueado (403/404) ou bem-sucedido (< 400)",
+            "Correlacionar com autenticação e outros alertas do mesmo IP"
+        ],
+        "validation_questions": [
+            "O recurso retornou conteúdo (200/3xx) ou foi negado?",
+            "O endpoint estava protegido por auth/WAF?",
+            "Há acesso repetido a outros endpoints sensíveis?"
+        ],
+        "containment_steps": [
+            "Bloquear IP temporariamente e reforçar WAF/ACL",
+            "Remover exposição de arquivos sensíveis (.env/.git) e endurecer configuração",
+            "Se houve acesso bem-sucedido, iniciar resposta a incidente e rotação de segredos"
+        ],
+        "escalate_when": [
+            "Qualquer resposta < 400 em endpoint sensível",
+            "Indícios de exfiltração/uso de segredo",
+            "Impacto em ambiente produtivo/externo"
+        ]
+    },
+    "SUSPICIOUS_UA": {
+        "check_first": [
+            "Validar se o UA pertence a integração/monitoramento legítimo",
+            "Verificar taxa e padrão de paths (muitos paths únicos = automação)",
+            "Correlacionar com SCAN_4XX/HIGH_4XX_RATE/SENSITIVE_ENDPOINT_ACCESS"
+        ],
+        "validation_questions": [
+            "Há picos de requests com o mesmo UA em curto intervalo?",
+            "O UA aparece com muitos 4xx/403/404?",
+            "O mesmo IP alterna entre UAs (evasão)?"
+        ],
+        "containment_steps": [
+            "Se não autorizado, bloquear IP/UA no WAF e aplicar rate-limit",
+            "Adicionar detecção/correlação por padrão de paths e status",
+            "Se recorrente, bloquear por ASN/segmento"
+        ],
+        "escalate_when": [
+            "UA indica ferramenta de exploração (sqlmap/nmap/dirbuster)",
+            "Há hits em endpoints sensíveis",
+            "Tráfego persistente apesar de mitigação"
+        ]
+    }
+}

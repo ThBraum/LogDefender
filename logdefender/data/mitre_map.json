@@ -1,0 +1,52 @@
+{
+  "BRUTE_FORCE": {
+    "tactic": "Credential Access",
+    "techniques": [
+      {
+        "id": "T1110",
+        "name": "Brute Force"
+      }
+    ],
+    "why_it_matters": "Pode indicar tentativa de comprometimento de conta (ATO). Se houver sucesso de login após as falhas, o risco sobe rapidamente."
+  },
+  "SCAN_4XX": {
+    "tactic": "Discovery",
+    "techniques": [
+      {
+        "id": "T1083",
+        "name": "File and Directory Discovery"
+      }
+    ],
+    "why_it_matters": "Varredura de paths tende a preceder exploração. Ajuda a identificar reconnaissance automatizado e exposição de rotas sensíveis."
+  },
+  "HIGH_4XX_RATE": {
+    "tactic": "Discovery",
+    "techniques": [
+      {
+        "id": "T1595",
+        "name": "Active Scanning"
+      }
+    ],
+    "why_it_matters": "Uma taxa alta de 4xx pode ser scanning/enumeração (ou erro de rota). Correlacionar com diversidade de paths e User-Agent aumenta precisão."
+  },
+  "SENSITIVE_ENDPOINT_ACCESS": {
+    "tactic": "Initial Access",
+    "techniques": [
+      {
+        "id": "T1190",
+        "name": "Exploit Public-Facing Application"
+      }
+    ],
+    "why_it_matters": "Acessos a endpoints sensíveis podem indicar tentativa de exploração/config leak. Se houver resposta < 400, tratar como alto impacto e escalar."
+  },
+  "SUSPICIOUS_UA": {
+    "tactic": "Discovery",
+    "techniques": [
+      {
+        "id": "T1595",
+        "name": "Active Scanning"
+      }
+    ],
+    "why_it_matters": "User-Agents de ferramentas (curl/requests/sqlmap/nmap) são um forte sinal de automação. Correlacionar com 4xx e endpoints sensíveis reduz falso positivo."
+  }
+}

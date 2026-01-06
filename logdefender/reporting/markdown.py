@@ -4,6 +4,7 @@ from collections import Counter
 from pathlib import Path
 from typing import List
 
+from logdefender.knowledge_base import format_mitre_line, get_mitre_for_rule, get_playbook_for_rule
 from logdefender.models import Alert, Event
 
 
@@ -33,6 +34,14 @@ def write_report_md(events: List[Event], alerts: List[Alert], out_dir: str | Pat
     lines.append("\n## Alertas\n")
     for a in alerts:
         lines.append(f"\n### {a.rule_id} — {a.title}\n")
+
+        mitre = get_mitre_for_rule(a.rule_id)
+        if mitre:
+            lines.append(f"- MITRE ATT&CK: **{format_mitre_line(mitre)}**\n")
+            why = mitre.get("why_it_matters")
+            if why:
+                lines.append(f"- Por que importa: {why}\n")
+
         if a.alert_id:
             lines.append(f"- ID do alerta: `{a.alert_id}`\n")
         lines.append(f"- Severidade: **{a.severity}**\n")
@@ -46,6 +55,34 @@ def write_report_md(events: List[Event], alerts: List[Alert], out_dir: str | Pat
             lines.append("- Ações recomendadas:\n")
             for action in a.recommended_actions:
                 lines.append(f"  - {action}\n")
+
+        playbook = get_playbook_for_rule(a.rule_id)
+        if playbook:
+            lines.append("- Playbook de triagem:\n")
+
+            check_first = playbook.get("check_first") or []
+            if check_first:
+                lines.append("  - O que verificar primeiro:\n")
+                for item in check_first:
+                    lines.append(f"    - {item}\n")
+
+            questions = playbook.get("validation_questions") or []
+            if questions:
+                lines.append("  - Perguntas de validação:\n")
+                for item in questions:
+                    lines.append(f"    - {item}\n")
+
+            containment = playbook.get("containment_steps") or []
+            if containment:
+                lines.append("  - Passos de contenção:\n")
+                for item in containment:
+                    lines.append(f"    - {item}\n")
+
+            escalate = playbook.get("escalate_when") or []
+            if escalate:
+                lines.append("  - Quando escalar:\n")
+                for item in escalate:
+                    lines.append(f"    - {item}\n")
 
     out_path = out_dir / "report.md"
     out_path.write_text("".join(lines), encoding="utf-8")
